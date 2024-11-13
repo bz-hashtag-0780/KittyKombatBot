@@ -1,6 +1,6 @@
 const express = require('express');
 const crypto = require('crypto');
-const admin = require('./firebaseAdmin');
+const admin = require('../firebase/firebaseAdmin');
 const router = express.Router();
 
 // Helper function to verify Telegram signature
@@ -26,6 +26,7 @@ function verifyTelegramSignature(initData) {
 	return hmac === hash;
 }
 
+// Route to authenticate and retrieve user game data
 router.post('/verify-telegram', async (req, res) => {
 	const { initData } = req.body;
 
@@ -37,10 +38,23 @@ router.post('/verify-telegram', async (req, res) => {
 	const uid = `telegram:${data.id}`;
 
 	try {
-		const customToken = await admin.auth().createCustomToken(uid);
-		res.json({ customToken });
+		const userDoc = admin.firestore().collection('users').doc(uid);
+		const doc = await userDoc.get();
+
+		if (!doc.exists) {
+			// Initialize new user data if not present
+			const initialData = {
+				userId: uid,
+				currency: 100,
+				cats: [{ level: 1 }],
+			};
+			await userDoc.set(initialData);
+			res.json({ authenticated: true, data: initialData });
+		} else {
+			res.json({ authenticated: true, data: doc.data() });
+		}
 	} catch (error) {
-		res.status(500).json({ error: 'Failed to generate token' });
+		res.status(500).json({ error: 'Failed to access game data' });
 	}
 });
 
