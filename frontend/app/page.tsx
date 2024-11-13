@@ -20,18 +20,21 @@ export default function HomePage() {
 	const [updateMessage, setUpdateMessage] = useState<string | null>(null);
 
 	useEffect(() => {
-		const authenticateUser = async () => {
-			try {
-				if (WebApp.initData) {
-					const data = await verifyTelegramUser(WebApp.initData);
-					setUserData(data); // Store user data if authenticated
+		// Check if the code is running in the browser
+		if (typeof window !== 'undefined') {
+			const authenticateUser = async () => {
+				try {
+					if (WebApp.initData) {
+						const data = await verifyTelegramUser(WebApp.initData);
+						setUserData(data); // Store user data if authenticated
+					}
+				} catch (err: any) {
+					setError(err.message);
 				}
-			} catch (err: any) {
-				setError(err.message);
-			}
-		};
+			};
 
-		authenticateUser();
+			authenticateUser();
+		}
 	}, []);
 
 	const handleUpdateData = async () => {
