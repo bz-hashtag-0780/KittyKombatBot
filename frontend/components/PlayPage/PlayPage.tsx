@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+// eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
 'use client';
 
 import { useState } from 'react';
@@ -16,7 +17,7 @@ export const PlayPage = () => {
 			<div className="flex items-center justify-between p-4 border-b border-gray-800">
 				<div className="flex items-center gap-2">
 					<Avatar>
-						<AvatarImage src="/placeholder.svg" />
+						<AvatarImage src="/cat.png" />
 						<AvatarFallback>HK</AvatarFallback>
 					</Avatar>
 					<div>
@@ -62,8 +63,8 @@ export const PlayPage = () => {
 							<div className="absolute inset-0 rounded-full shadow-inner" />
 							{/* Hamster image */}
 							<img
-								src="https://hamsterkombatgame.io/images/hamsters/11.png"
-								alt="Hamster"
+								src="/cat.png"
+								alt="cat"
 								className="relative w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
 							/>
 						</div>

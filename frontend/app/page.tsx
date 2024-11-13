@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-assign-module-variable */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import { PlayPage } from '@/components/PlayPage/PlayPage';
 
@@ -11,7 +12,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import WebApp from '@twa-dev/sdk';
 import { verifyTelegramUser, updateUserData } from '@/lib/api';
 
 export default function HomePage() {
@@ -20,40 +20,46 @@ export default function HomePage() {
 	const [updateMessage, setUpdateMessage] = useState<string | null>(null);
 
 	useEffect(() => {
-		// Check if the code is running in the browser
-		if (typeof window !== 'undefined') {
-			const authenticateUser = async () => {
-				try {
-					if (WebApp.initData) {
-						const data = await verifyTelegramUser(WebApp.initData);
-						setUserData(data); // Store user data if authenticated
-					}
-				} catch (err: any) {
-					setError(err.message);
-				}
-			};
+		let WebApp;
+		// Dynamically import @twa-dev/sdk inside useEffect
+		const authenticateUser = async () => {
+			try {
+				// Import WebApp only on the client side
+				const module = await import('@twa-dev/sdk');
+				WebApp = module.default;
 
-			authenticateUser();
-		}
+				// Now WebApp is defined, and we can use it safely
+				if (WebApp.initData) {
+					const data = await verifyTelegramUser(WebApp.initData);
+					setUserData(data);
+				}
+			} catch (err: any) {
+				setError(err.message);
+			}
+		};
+
+		authenticateUser();
 	}, []);
 
 	const handleUpdateData = async () => {
-		if (!userData || !WebApp.initData) return;
+		if (!userData) return;
 
 		try {
-			// Send initData with the update request for authentication
-			const updatedData = await updateUserData(
-				userData.data.userId,
-				{
-					currency: (userData.data.currency || 0) + 10, // Increment currency by 10
-				},
-				WebApp.initData
-			);
-			setUpdateMessage(updatedData.message);
+			const module = await import('@twa-dev/sdk');
+			const WebApp = module.default;
 
-			// Refresh user data to show the updated currency
-			const refreshedData = await verifyTelegramUser(WebApp.initData);
-			setUserData(refreshedData);
+			if (WebApp.initData) {
+				const updatedData = await updateUserData(
+					userData.data.userId,
+					{ currency: (userData.data.currency || 0) + 10 },
+					WebApp.initData
+				);
+				setUpdateMessage(updatedData.message);
+
+				// Refresh user data
+				const refreshedData = await verifyTelegramUser(WebApp.initData);
+				setUserData(refreshedData);
+			}
 		} catch (err: any) {
 			setError(err.message);
 		}
@@ -64,7 +70,6 @@ export default function HomePage() {
 			<h1>Welcome to Kitty Kombat!</h1>
 			{error && <p className="error">{error}</p>}
 			{updateMessage && <p className="success">{updateMessage}</p>}
-
 			{userData && (
 				<div>
 					<h2>User Data:</h2>
