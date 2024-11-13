@@ -2,7 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
 
 // Replace this URL with the URL of your deployed Next.js app
-const webAppUrl = 'https://localhost:3001/';
+const webAppUrl = 'https://kitty-kombat-bot.vercel.app/kitty';
 
 bot.onText(/\/start/, (msg) => {
 	const chatId = msg.chat.id;
