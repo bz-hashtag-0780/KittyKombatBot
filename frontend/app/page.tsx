@@ -35,12 +35,17 @@ export default function HomePage() {
 	}, []);
 
 	const handleUpdateData = async () => {
-		if (!userData) return;
+		if (!userData || !WebApp.initData) return;
 
 		try {
-			const updatedData = await updateUserData(userData.data.userId, {
-				currency: (userData.data.currency || 0) + 10, // Increment currency by 10
-			});
+			// Send initData with the update request for authentication
+			const updatedData = await updateUserData(
+				userData.data.userId,
+				{
+					currency: (userData.data.currency || 0) + 10, // Increment currency by 10
+				},
+				WebApp.initData
+			);
 			setUpdateMessage(updatedData.message);
 
 			// Refresh user data to show the updated currency

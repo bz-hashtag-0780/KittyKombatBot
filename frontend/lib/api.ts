@@ -15,13 +15,17 @@ export const verifyTelegramUser = async (initData: string) => {
 	return data;
 };
 
-export const updateUserData = async (userId: string, newData: object) => {
+export const updateUserData = async (
+	userId: string,
+	newData: object,
+	initData: string
+) => {
 	const response = await fetch(
 		`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/update-data`,
 		{
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ userId, newData }),
+			body: JSON.stringify({ userId, newData, initData }), // Include initData for authentication
 		}
 	);
 

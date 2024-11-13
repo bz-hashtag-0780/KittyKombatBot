@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const admin = require('../firebase/firebaseAdmin');
 const router = express.Router();
 
-// Helper function to verify Telegram signature (same as before)
+// Helper function to verify Telegram signature
 function verifyTelegramSignature(initData) {
 	const secretKey = crypto
 		.createHash('sha256')
@@ -26,43 +26,21 @@ function verifyTelegramSignature(initData) {
 	return hmac === hash;
 }
 
-// Existing route to verify Telegram and get user data
-router.post('/verify-telegram', async (req, res) => {
-	const { initData } = req.body;
+// New route to update user data with authentication check
+router.post('/update-data', async (req, res) => {
+	const { initData, newData } = req.body;
 
+	// Verify the Telegram user with initData
 	if (!verifyTelegramSignature(initData)) {
 		return res.status(401).json({ error: 'Unauthorized' });
 	}
 
+	// Parse user ID from initData and ensure they can only modify their own data
 	const data = Object.fromEntries(new URLSearchParams(initData));
 	const uid = `telegram:${data.id}`;
 
 	try {
 		const userDoc = admin.firestore().collection('users').doc(uid);
-		const doc = await userDoc.get();
-
-		if (!doc.exists) {
-			const initialData = {
-				userId: uid,
-				currency: 100,
-				cats: [{ level: 1 }],
-			};
-			await userDoc.set(initialData);
-			res.json({ authenticated: true, data: initialData });
-		} else {
-			res.json({ authenticated: true, data: doc.data() });
-		}
-	} catch (error) {
-		res.status(500).json({ error: 'Failed to access game data' });
-	}
-});
-
-// New route to update user data
-router.post('/update-data', async (req, res) => {
-	const { userId, newData } = req.body;
-
-	try {
-		const userDoc = admin.firestore().collection('users').doc(userId);
 		await userDoc.update(newData);
 		res.json({ success: true, message: 'Data updated successfully' });
 	} catch (error) {
