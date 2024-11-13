@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const admin = require('../firebase/firebaseAdmin');
 const router = express.Router();
 
-// Helper function to verify Telegram signature
+// Helper function to verify Telegram signature (same as before)
 function verifyTelegramSignature(initData) {
 	const secretKey = crypto
 		.createHash('sha256')
@@ -26,7 +26,7 @@ function verifyTelegramSignature(initData) {
 	return hmac === hash;
 }
 
-// Route to authenticate and retrieve user game data
+// Existing route to verify Telegram and get user data
 router.post('/verify-telegram', async (req, res) => {
 	const { initData } = req.body;
 
@@ -42,7 +42,6 @@ router.post('/verify-telegram', async (req, res) => {
 		const doc = await userDoc.get();
 
 		if (!doc.exists) {
-			// Initialize new user data if not present
 			const initialData = {
 				userId: uid,
 				currency: 100,
@@ -55,6 +54,19 @@ router.post('/verify-telegram', async (req, res) => {
 		}
 	} catch (error) {
 		res.status(500).json({ error: 'Failed to access game data' });
+	}
+});
+
+// New route to update user data
+router.post('/update-data', async (req, res) => {
+	const { userId, newData } = req.body;
+
+	try {
+		const userDoc = admin.firestore().collection('users').doc(userId);
+		await userDoc.update(newData);
+		res.json({ success: true, message: 'Data updated successfully' });
+	} catch (error) {
+		res.status(500).json({ error: 'Failed to update data' });
 	}
 });
 
