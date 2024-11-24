@@ -26,6 +26,25 @@ function verifyTelegramSignature(initData) {
 	return hmac === hash;
 }
 
+// Route to authenticate user
+router.post('/auth', (req, res) => {
+	const { initData } = req.body;
+
+	if (verifyTelegramSignature(initData)) {
+		// Extract user information from initData
+		const data = Object.fromEntries(new URLSearchParams(initData));
+		const userId = data.id;
+		const username = data.username;
+		const photoUrl = data.photo_url;
+
+		// Handle user authentication (e.g., create a session, generate a token)
+		// For simplicity, we'll just return the user data
+		res.json({ userId, username, photoUrl });
+	} else {
+		res.status(401).json({ error: 'Invalid initData' });
+	}
+});
+
 // New route to update user data with authentication check
 router.post('/update-data', async (req, res) => {
 	const { initData, newData } = req.body;

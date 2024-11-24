@@ -2,14 +2,35 @@
 // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { BadgeCheck, Coins, Gamepad2, Gift, ShoppingCart } from 'lucide-react';
+import axios from 'axios';
+import WebApp from '@twa-dev/sdk';
 
 export const PlayPage = () => {
 	const [count, setCount] = useState(0);
 	const [profitPerHour] = useState(15);
+
+	useEffect(() => {
+		const initData = WebApp.initData;
+
+		axios
+			.post('/api/auth/auth', { initData })
+			.then((response) => {
+				const { userId, username, photoUrl } = response.data;
+				console.log('User authenticated:', {
+					userId,
+					username,
+					photoUrl,
+				});
+				// Store user data in state or context
+			})
+			.catch((error) => {
+				console.error('Authentication failed:', error);
+			});
+	}, []);
 
 	return (
 		<div className="flex flex-col h-screen bg-gray-950">
