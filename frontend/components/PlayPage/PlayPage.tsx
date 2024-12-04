@@ -2,12 +2,10 @@
 // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { BadgeCheck, Coins, Gamepad2, Gift, ShoppingCart } from 'lucide-react';
-import axios from 'axios';
-import WebApp from '@twa-dev/sdk';
 import { useAuth } from '@/context/AuthContext';
 
 export const PlayPage = () => {
