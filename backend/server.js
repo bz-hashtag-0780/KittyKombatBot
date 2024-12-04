@@ -1,17 +1,25 @@
 const express = require('express');
-const dotenv = require('dotenv');
-const authRouter = require('./routes/authRoutes');
-const bot = require('./bot/bot');
 const cors = require('cors');
-
-dotenv.config();
+const bodyParser = require('body-parser');
+const authRoutes = require('./routes/authRoutes');
+const gameRoutes = require('./routes/gameRoutes');
+require('dotenv').config();
 
 const app = express();
-app.use(cors());
-app.use(express.json());
-app.use('/api/auth', authRouter);
+const PORT = process.env.PORT || 3000;
 
-const PORT = process.env.PORT || 3001;
+app.use(
+	cors({
+		origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+		methods: ['POST', 'GET'],
+	})
+);
+app.use(bodyParser.json());
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/game', gameRoutes);
+
 app.listen(PORT, () => {
-	console.log(`Server is running on port ${PORT}`);
+	console.log(`Server running on http://localhost:${PORT}`);
 });

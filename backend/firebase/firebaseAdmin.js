@@ -17,4 +17,8 @@ admin.initializeApp({
 	databaseURL: `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`,
 });
 
-module.exports = admin;
+const db = admin.firestore();
+
+console.log('Firebase connected successfully');
+
+module.exports = { admin, db };

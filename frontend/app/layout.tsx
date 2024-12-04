@@ -1,4 +1,5 @@
 'use client';
+import { AuthContextProvider } from '@/context/AuthContext';
 import './globals.css';
 
 export default function RootLayout({
@@ -8,7 +9,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body suppressHydrationWarning={true}>{children}</body>
+			<body suppressHydrationWarning={true}>
+				<AuthContextProvider>{children}</AuthContextProvider>
+			</body>
 		</html>
 	);
 }

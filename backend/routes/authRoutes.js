@@ -1,69 +1,44 @@
 const express = require('express');
-const crypto = require('crypto');
-const admin = require('../firebase/firebaseAdmin');
+const validateTelegramInitData = require('../utils/validateTelegramInitData');
+const { generateToken } = require('../utils/jwt');
+const { db } = require('../firebase/firebaseAdmin');
+
 const router = express.Router();
 
-// Helper function to verify Telegram signature
-function verifyTelegramSignature(initData) {
-	const secretKey = crypto
-		.createHash('sha256')
-		.update(process.env.TELEGRAM_BOT_TOKEN)
-		.digest();
-
-	const data = Object.fromEntries(new URLSearchParams(initData));
-	const hash = data.hash;
-	delete data.hash;
-
-	const dataString = Object.keys(data)
-		.sort()
-		.map((key) => `${key}=${data[key]}`)
-		.join('\n');
-
-	const hmac = crypto
-		.createHmac('sha256', secretKey)
-		.update(dataString)
-		.digest('hex');
-	return hmac === hash;
-}
-
-// Route to authenticate user
-router.post('/auth', (req, res) => {
+router.post('/auth', async (req, res) => {
 	const { initData } = req.body;
 
-	if (verifyTelegramSignature(initData)) {
-		// Extract user information from initData
-		const data = Object.fromEntries(new URLSearchParams(initData));
-		const userId = data.id;
-		const username = data.username;
-		const photoUrl = data.photo_url;
-
-		// Handle user authentication (e.g., create a session, generate a token)
-		// For simplicity, we'll just return the user data
-		res.json({ userId, username, photoUrl });
-	} else {
-		res.status(401).json({ error: 'Invalid initData' });
+	if (!initData) {
+		return res.status(400).json({ error: 'initData is required' });
 	}
-});
-
-// New route to update user data with authentication check
-router.post('/update-data', async (req, res) => {
-	const { initData, newData } = req.body;
-
-	// Verify the Telegram user with initData
-	if (!verifyTelegramSignature(initData)) {
-		return res.status(401).json({ error: 'Unauthorized' });
-	}
-
-	// Parse user ID from initData and ensure they can only modify their own data
-	const data = Object.fromEntries(new URLSearchParams(initData));
-	const uid = `telegram:${data.id}`;
 
 	try {
-		const userDoc = admin.firestore().collection('users').doc(uid);
-		await userDoc.update(newData);
-		res.json({ success: true, message: 'Data updated successfully' });
+		validateTelegramInitData(initData);
+
+		const decodedInitData = decodeURIComponent(initData);
+		const urlSearchParams = new URLSearchParams(decodedInitData);
+		const params = Object.fromEntries(urlSearchParams.entries());
+
+		const user = JSON.parse(params.user);
+		const token = generateToken({ id: user.id, username: user.username });
+
+		// Save user to Firestore
+		const userDoc = db.collection('users').doc(user.id.toString());
+		await userDoc.set(
+			{
+				username: user.username,
+				firstName: user.first_name,
+				lastName: user.last_name || '',
+				authDate: new Date(parseInt(params.auth_date, 10) * 1000),
+				lastLogin: admin.firestore.FieldValue.serverTimestamp(),
+			},
+			{ merge: true }
+		);
+
+		res.json({ message: 'Authenticated', token });
 	} catch (error) {
-		res.status(500).json({ error: 'Failed to update data' });
+		console.error('Authentication error:', error.message);
+		res.status(400).json({ error: error.message });
 	}
 });
 
