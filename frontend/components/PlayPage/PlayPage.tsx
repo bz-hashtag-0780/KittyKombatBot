@@ -15,25 +15,6 @@ export const PlayPage = () => {
 	const [profitPerHour] = useState(15);
 	const { initData } = useAuth();
 
-	useEffect(() => {
-		const initData = WebApp.initData;
-
-		axios
-			.post('/api/auth/auth', { initData })
-			.then((response) => {
-				const { userId, username, photoUrl } = response.data;
-				console.log('User authenticated:', {
-					userId,
-					username,
-					photoUrl,
-				});
-				// Store user data in state or context
-			})
-			.catch((error) => {
-				console.error('Authentication failed:', error);
-			});
-	}, []);
-
 	return (
 		<div className="flex flex-col h-screen bg-gray-950">
 			{/* Header */}
