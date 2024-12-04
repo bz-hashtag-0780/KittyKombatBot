@@ -8,10 +8,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { BadgeCheck, Coins, Gamepad2, Gift, ShoppingCart } from 'lucide-react';
 import axios from 'axios';
 import WebApp from '@twa-dev/sdk';
+import { useAuth } from '@/context/AuthContext';
 
 export const PlayPage = () => {
 	const [count, setCount] = useState(0);
 	const [profitPerHour] = useState(15);
+	const { initData } = useAuth();
 
 	useEffect(() => {
 		const initData = WebApp.initData;
@@ -44,7 +46,7 @@ export const PlayPage = () => {
 					<div>
 						<div className="flex items-center gap-1">
 							<span className="font-semibold text-white">
-								@hamsterPlayer
+								{initData}
 							</span>
 							<BadgeCheck className="w-4 h-4 text-blue-500" />
 						</div>
