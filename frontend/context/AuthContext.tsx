@@ -56,17 +56,19 @@ export const AuthContextProvider = ({
 					);
 
 					const { token } = response.data;
-					const decodedToken = jwtDecode<CustomJwtPayload>(token);
+					const { id, username } = jwtDecode<CustomJwtPayload>(
+						response.data.token
+					);
 
 					setToken(token);
-					setUserID(decodedToken.id);
-					setUsername(decodedToken.username);
+					setUserID(id);
+					setUsername(username);
 					setInitData(initData);
 					setError(null);
 
 					console.log('Authenticated successfully:', {
-						id: decodedToken.id,
-						username: decodedToken.username,
+						id: id,
+						username: username,
 					});
 				} catch (error) {
 					setError('Authentication failed');

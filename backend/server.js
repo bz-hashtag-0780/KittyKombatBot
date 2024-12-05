@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
 const gameRoutes = require('./routes/gameRoutes');
 require('dotenv').config();
-const bot = require('./bot');
+const bot = require('./bot/bot');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
