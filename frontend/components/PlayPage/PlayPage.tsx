@@ -25,7 +25,7 @@ export const PlayPage = () => {
 					<div>
 						<div className="flex items-center gap-1">
 							<span className="font-semibold text-white">
-								{initData}
+								{/* {initData} */}@blubbernugget
 							</span>
 							<BadgeCheck className="w-4 h-4 text-blue-500" />
 						</div>
