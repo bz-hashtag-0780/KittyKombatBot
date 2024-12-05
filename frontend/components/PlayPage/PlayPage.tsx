@@ -81,7 +81,7 @@ export const PlayPage = () => {
 			</div>
 
 			{/* Footer Navigation */}
-			<div className="border-t border-gray-800 bg-gray-900">
+			<div className="border-t border-gray-800 bg-gray-900 text-white">
 				<div className="flex justify-around p-4">
 					<Button
 						variant="ghost"
