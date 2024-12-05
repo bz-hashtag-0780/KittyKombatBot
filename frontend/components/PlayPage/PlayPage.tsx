@@ -6,12 +6,12 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { BadgeCheck, Coins, Gamepad2, Gift, ShoppingCart } from 'lucide-react';
-// import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 
 export const PlayPage = () => {
 	const [count, setCount] = useState(0);
 	const [profitPerHour] = useState(15);
-	// const { initData } = useAuth();
+	const { username } = useAuth();
 
 	return (
 		<div className="flex flex-col h-screen bg-gray-950">
@@ -25,7 +25,7 @@ export const PlayPage = () => {
 					<div>
 						<div className="flex items-center gap-1">
 							<span className="font-semibold text-white">
-								{/* {initData} */}@blubbernugget
+								{/* {initData} */}@{username}
 							</span>
 							<BadgeCheck className="w-4 h-4 text-blue-500" />
 						</div>
