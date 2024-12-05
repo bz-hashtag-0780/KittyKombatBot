@@ -1,11 +1,11 @@
 const express = require('express');
 const validateTelegramInitData = require('../utils/validateTelegramInitData');
 const { generateToken } = require('../utils/jwt');
-const { db } = require('../firebase/firebaseAdmin');
+const { admin, db } = require('../firebase/firebaseAdmin');
 
 const router = express.Router();
 
-router.post('/auth', async (req, res) => {
+router.post('/', async (req, res) => {
 	const { initData } = req.body;
 
 	if (!initData) {
