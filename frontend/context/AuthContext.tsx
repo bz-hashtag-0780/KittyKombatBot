@@ -50,7 +50,7 @@ export const AuthContextProvider = ({
 
 				try {
 					const response = await axios.post(
-						`${process.env.NEXT_PUBLIC_API_URL}/auth`,
+						`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth`,
 						{ initData },
 						{ headers: { 'Content-Type': 'application/json' } }
 					);
